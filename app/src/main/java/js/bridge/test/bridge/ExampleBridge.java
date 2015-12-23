@@ -6,10 +6,8 @@ import android.util.Log;
 import com.eclipsesource.v8.V8Array;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 
 import js.bridge.spider.SpiderBridge;
 import js.bridge.spider.SpiderBridgeCallBack;
@@ -17,9 +15,10 @@ import js.bridge.spider.SpiderBridgeCallBack;
 /**
  * Created by stadiko on 12/22/15.
  */
-public class ExampleBridge implements SpiderBridgeCallBack {
+public class ExampleBridge extends SpiderBridge implements SpiderBridgeCallBack {
     private static ExampleBridge sInstance;
-    private SpiderBridge mSpiderBridge;
+
+    private String mJsScript;
 
     private ExampleBridge() {
     }
@@ -32,8 +31,14 @@ public class ExampleBridge implements SpiderBridgeCallBack {
         if (sInstance == null) {
             sInstance = new ExampleBridge();
             sInstance.initJsScript(context);
+            sInstance.initV8();
             sInstance.registerMethods();
         }
+    }
+
+    @Override
+    protected String getJsScript() {
+        return mJsScript;
     }
 
     private void initJsScript(Context context) {
@@ -49,17 +54,15 @@ public class ExampleBridge implements SpiderBridgeCallBack {
             }
 
             in.close();
-            String source = buf.toString();
-            mSpiderBridge = new SpiderBridge(source);
-        } catch (UnsupportedEncodingException e) {
+            mJsScript = buf.toString();
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            //Throw Exception
         }
     }
 
     private void registerMethods() {
-        mSpiderBridge.registerVoidCallBack("processEvent", this);
+        registerVoidCallBack("processEvent", this);
     }
 
     /**
@@ -95,30 +98,18 @@ public class ExampleBridge implements SpiderBridgeCallBack {
         return null;
     }
 
-    public void releaseThread() {
-        mSpiderBridge.releaseThread();
-    }
-
-    public void acquireThread() {
-        mSpiderBridge.acquireThread();
-    }
-
     public void notifyTouch(String viewName) {
-        V8Array params = mSpiderBridge.getNewV8Array().push(viewName);
-        mSpiderBridge.executeVoidFunction("notifyTouchEvent", params);
+        V8Array params = getNewV8Array().push(viewName);
+        executeVoidFunction("notifyTouchEvent", params);
     }
 
     public void notifySwipe(String viewName) {
-        V8Array params = mSpiderBridge.getNewV8Array().push(viewName);
-        mSpiderBridge.executeVoidFunction("notifySwipeEvent", params);
+        V8Array params = getNewV8Array().push(viewName);
+        executeVoidFunction("notifySwipeEvent", params);
     }
 
     public void notifyClick(String viewName) {
-        V8Array params = mSpiderBridge.getNewV8Array().push(viewName);
-        mSpiderBridge.executeVoidFunction("notifyClickEvent", params);
-    }
-
-    public void destroyBridge() {
-        mSpiderBridge.destroyBride();
+        V8Array params = getNewV8Array().push(viewName);
+        executeVoidFunction("notifyClickEvent", params);
     }
 }

@@ -10,19 +10,24 @@ import com.eclipsesource.v8.V8Object;
 /**
  * Created by stadiko on 12/17/15.
  */
-public class SpiderBridge {
-    private String mJsScript;
+public abstract class SpiderBridge {
     protected V8 mV8;
 
-    public SpiderBridge(String jsScript) {
-        mJsScript = jsScript;
-        initV8();
+    public SpiderBridge() {
+
     }
 
-    private void initV8() {
+    protected void initV8() {
         mV8 = V8.createV8Runtime();
-        mV8.executeVoidScript(mJsScript);
+        String jsScript = getJsScript();
+        if (jsScript == null || jsScript.length() == 0) {
+            //Throw Error
+            return;
+        }
+        mV8.executeVoidScript(getJsScript());
     }
+
+    protected abstract String getJsScript();
 
     public int executeIntegerFunction(String name, V8Array parameters) {
         return mV8.executeIntegerFunction(name, parameters);
@@ -82,24 +87,24 @@ public class SpiderBridge {
         mV8.registerJavaMethod(v8CallBack, methodName);
     }
 
-    public void releaseThread(){
+    public void releaseThread() {
         mV8.getLocker().release();
     }
 
-    public void acquireThread(){
+    public void acquireThread() {
         mV8.getLocker().acquire();
     }
 
     /**
      * This method should be called to release the v8 JS Bridge
      */
-    public void destroyBride() {
+    public void destroyBridge() {
         if (mV8 != null) {
             mV8.release();
         }
     }
 
-    public V8Array getNewV8Array() {
+    protected V8Array getNewV8Array() {
         return new V8Array(mV8);
     }
 }
