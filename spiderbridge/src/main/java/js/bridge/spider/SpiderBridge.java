@@ -29,40 +29,40 @@ public abstract class SpiderBridge {
 
     protected abstract String getJsScript();
 
-    public int executeIntegerFunction(String name, V8Array parameters) {
+    public final int executeIntegerFunction(String name, V8Array parameters) {
         return mV8.executeIntegerFunction(name, parameters);
     }
 
-    public double executeDoubleFunction(String name, V8Array parameters) {
+    public final double executeDoubleFunction(String name, V8Array parameters) {
         return mV8.executeDoubleFunction(name, parameters);
     }
 
-    public String executeStringFunction(String name, V8Array parameters) {
+    public final String executeStringFunction(String name, V8Array parameters) {
         return mV8.executeStringFunction(name, parameters);
     }
 
-    public boolean executeBooleanFunction(String name, V8Array parameters) {
+    public final boolean executeBooleanFunction(String name, V8Array parameters) {
         return mV8.executeBooleanFunction(name, parameters);
     }
 
-    public V8Array executeArrayFunction(String name, V8Array parameters) {
+    public final V8Array executeArrayFunction(String name, V8Array parameters) {
         return mV8.executeArrayFunction(name, parameters);
     }
 
-    public V8Object executeObjectFunction(String name, V8Array parameters) {
+    public final V8Object executeObjectFunction(String name, V8Array parameters) {
         return mV8.executeObjectFunction(name, parameters);
     }
 
-    public Object executeFunction(String name, V8Array parameters) {
+    public final Object executeFunction(String name, V8Array parameters) {
         return mV8.executeFunction(name, parameters);
     }
 
-    public void executeVoidFunction(String name, V8Array parameters) {
+    public final void executeVoidFunction(String name, V8Array parameters) {
         mV8.executeVoidFunction(name, parameters);
     }
 
 
-    public void registerVoidCallBack(final String methodName, final SpiderBridgeCallBack callBack) {
+    public final void registerVoidCallBack(final String methodName, final SpiderBridgeCallBack callBack) {
         JavaVoidCallback v8CallBack = new JavaVoidCallback() {
             @Override
             public void invoke(V8Object v8Object, V8Array v8Array) {
@@ -74,7 +74,7 @@ public abstract class SpiderBridge {
         mV8.registerJavaMethod(v8CallBack, methodName);
     }
 
-    public void registerCallBack(final String methodName, final SpiderBridgeCallBack callBack) {
+    public final void registerCallBack(final String methodName, final SpiderBridgeCallBack callBack) {
         JavaCallback v8CallBack = new JavaCallback() {
             @Override
             public Object invoke(V8Object v8Object, V8Array v8Array) {
@@ -87,24 +87,24 @@ public abstract class SpiderBridge {
         mV8.registerJavaMethod(v8CallBack, methodName);
     }
 
-    public void releaseThread() {
+    public final void releaseThread() {
         mV8.getLocker().release();
     }
 
-    public void acquireThread() {
+    public final void acquireThread() {
         mV8.getLocker().acquire();
     }
 
     /**
      * This method should be called to release the v8 JS Bridge
      */
-    public void destroyBridge() {
+    public final void destroyBridge() {
         if (mV8 != null) {
             mV8.release();
         }
     }
 
-    protected V8Array getNewV8Array() {
+    protected final V8Array getNewV8Array() {
         return new V8Array(mV8);
     }
 }
