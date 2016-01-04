@@ -6,6 +6,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -45,12 +47,11 @@ public class MainActivity extends AppCompatActivity {
         mStopEventsBtn = (Button) findViewById(R.id.stop_events_btn);
         mTextView = (TextView) findViewById(R.id.events_text);
 
-        mFireEventsTask = new FireEventsTask();
-
         mStartEventsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mKeepFiringEvents = true;
+                mFireEventsTask = new FireEventsTask();
                 mFireEventsTask.execute();
             }
         });
@@ -59,7 +60,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mKeepFiringEvents = false;
-                mFireEventsTask.cancel(true);
+                if (mFireEventsTask != null) {
+                    mFireEventsTask.cancel(true);
+                }
+            }
+        });
+
+        findViewById(R.id.container).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                Log.v(MainActivity.class.getSimpleName(), "Touched " + motionEvent.toString());
+                return false;
             }
         });
     }
@@ -110,9 +121,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            ExampleBridge.getBridge().acquireThread();
+        }
+
+        @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-
+            ExampleBridge.getBridge().acquireThread();
         }
     }
 
